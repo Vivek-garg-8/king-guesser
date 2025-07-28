@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import FloatingParticles from './FloatingParticles';
 
 const KING_FACTS = [
   "The Royal Pair awaits! Two kings now hide in the shadows, making your quest twice as challenging.",
@@ -73,19 +74,7 @@ function LevelInterstitial({
     <div className="interstitial-overlay" role="dialog" aria-labelledby="level-transition-title" aria-describedby="level-transition-description">
       {/* Animated Background */}
       <div className="interstitial-background">
-        <div className="floating-particles">
-          {[...Array(20)].map((_, i) => (
-            <div 
-              key={i} 
-              className="particle" 
-              style={{
-                left: `${Math.random() * 100}%`,
-                animationDelay: `${Math.random() * 3}s`,
-                animationDuration: `${3 + Math.random() * 2}s`
-              }}
-            />
-          ))}
-        </div>
+        <FloatingParticles />
       </div>
 
       {/* Progress Bar */}

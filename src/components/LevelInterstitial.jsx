@@ -13,8 +13,7 @@ function LevelInterstitial({
   onSkip 
 }) {
   const [showLoader, setShowLoader] = useState(true);
-  const [showContinueButton, setShowContinueButton] = useState(false);
-  const [showSkip, setShowSkip] = useState(false);
+  const [showButtons, setShowButtons] = useState(false);
   const [selectedFact, setSelectedFact] = useState('');
   const [progress, setProgress] = useState(0);
   const [showRecap, setShowRecap] = useState(true);
@@ -24,8 +23,7 @@ function LevelInterstitial({
 
     // Reset state when interstitial becomes visible
     setShowLoader(true);
-    setShowContinueButton(false);
-    setShowSkip(false);
+    setShowButtons(false);
     setProgress(0);
     setShowRecap(true);
     
@@ -41,25 +39,19 @@ function LevelInterstitial({
       setShowRecap(false);
     }, 1000);
 
-    // Show skip option after 0.5 seconds
-    const skipTimer = setTimeout(() => {
-      setShowSkip(true);
-    }, 500);
-
     // Animate progress bar
     const progressTimer = setTimeout(() => {
-      setProgress(50);
+      setProgress(100);
     }, 100);
 
-    // Hide loader and show continue button after 1.5 seconds
+    // Hide loader and show buttons after 1.5 seconds
     const loaderTimer = setTimeout(() => {
       setShowLoader(false);
-      setShowContinueButton(true);
+      setShowButtons(true);
     }, 1500);
 
     return () => {
       clearTimeout(recapTimer);
-      clearTimeout(skipTimer);
       clearTimeout(progressTimer);
       clearTimeout(loaderTimer);
     };
@@ -108,17 +100,6 @@ function LevelInterstitial({
           aria-label="Level transition progress"
         />
       </div>
-
-      {/* Skip Button */}
-      {showSkip && (
-        <button 
-          className="skip-button"
-          onClick={handleSkip}
-          aria-label="Skip level transition"
-        >
-          Skip
-        </button>
-      )}
 
       {/* Level 1 Recap */}
       {showRecap && (
@@ -172,16 +153,25 @@ function LevelInterstitial({
           </div>
         )}
 
-        {/* Continue Button */}
-        {showContinueButton && (
-          <button 
-            className="continue-button"
-            onClick={handleContinue}
-            aria-label="Continue to Level 2"
-          >
-            <span className="button-text">Tap to Continue</span>
-            <span className="button-icon">⚔️</span>
-          </button>
+        {/* Buttons Container */}
+        {showButtons && (
+            <div className="button-container">
+                <button 
+                    className="continue-button"
+                    onClick={handleContinue}
+                    aria-label="Continue to Level 2"
+                >
+                    <span className="button-text">Tap to Continue</span>
+                    <span className="button-icon">⚔️</span>
+                </button>
+                <button 
+                    className="skip-button"
+                    onClick={handleSkip}
+                    aria-label="Skip level transition"
+                >
+                    Skip
+                </button>
+            </div>
         )}
       </div>
 
@@ -242,28 +232,6 @@ function LevelInterstitial({
           background: linear-gradient(90deg, #ffd700, #ffed4e);
           transition: width 1.5s ease-out;
           box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
-        }
-
-        .skip-button {
-          position: absolute;
-          top: 20px;
-          right: 20px;
-          background: transparent;
-          border: 1px solid rgba(255, 215, 0, 0.5);
-          color: #ffd700;
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          z-index: 10;
-          font-family: 'Crimson Text', serif;
-        }
-
-        .skip-button:hover {
-          background: rgba(255, 215, 0, 0.1);
-          border-color: #ffd700;
-          transform: translateY(-1px);
         }
 
         .level-recap {
@@ -357,7 +325,11 @@ function LevelInterstitial({
         }
 
         .fact-container {
-          margin-bottom: 40px;
+          min-height: 120px; /* Reserve space to prevent layout shift */
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          align-items: center;
           animation: fadeInUp 0.6s ease-out;
         }
 
@@ -377,6 +349,15 @@ function LevelInterstitial({
           text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
         }
 
+        .button-container {
+            margin-top: 40px;
+            display: flex;
+            flex-direction: column-reverse; /* Puts Continue button on top of Skip */
+            align-items: center;
+            gap: 16px; /* Space between buttons */
+            animation: fadeInUp 0.6s ease-out;
+        }
+
         .continue-button {
           background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
           border: 3px solid #b8860b;
@@ -390,8 +371,7 @@ function LevelInterstitial({
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
-          min-width: 200px;
-          min-height: 48px;
+          min-width: 220px; /* Ensure consistent width */
           display: flex;
           align-items: center;
           justify-content: center;
@@ -399,8 +379,27 @@ function LevelInterstitial({
           text-transform: uppercase;
           letter-spacing: 1px;
           box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
-          animation: fadeInUp 0.6s ease-out;
         }
+        
+        .skip-button {
+          background: transparent;
+          border: none;
+          color: rgba(255, 215, 0, 0.6);
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-family: 'Crimson Text', serif;
+          text-transform: uppercase;
+          letter-spacing: 1px;
+        }
+
+        .skip-button:hover {
+          color: #ffd700;
+          text-decoration: underline;
+        }
+
 
         .continue-button::before {
           content: '';
@@ -537,14 +536,7 @@ function LevelInterstitial({
           .continue-button {
             font-size: 1rem;
             padding: 14px 28px;
-            min-width: 180px;
-          }
-
-          .skip-button {
-            top: 16px;
-            right: 16px;
-            padding: 6px 12px;
-            font-size: 13px;
+            min-width: 200px;
           }
 
           .level-recap {
@@ -565,11 +557,11 @@ function LevelInterstitial({
           .continue-button {
             font-size: 0.9rem;
             padding: 12px 24px;
-            min-width: 160px;
+            min-width: 180px;
           }
 
-          .fact-container {
-            margin-bottom: 30px;
+          .button-container {
+            margin-top: 30px;
           }
 
           .crown-icon {

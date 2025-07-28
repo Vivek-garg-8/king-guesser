@@ -111,34 +111,84 @@ function App() {
   
   if (gameState === 'welcome') {
     return (
-      <div className="bg-gray-900 min-h-screen flex items-center justify-center p-4">
-        <WelcomeScreen onGameStart={handleGameStart} />
-      </div>
+      <WelcomeScreen onGameStart={handleGameStart} />
     );
   }
 
   if (gameState === 'finished') {
     return (
-      <div className="bg-gray-900 min-h-screen flex flex-col items-center justify-center p-4 text-center">
-        <h1 className="text-5xl font-bold text-yellow-400">Game Over!</h1>
-        <p className="text-2xl mt-4 text-white">Well done, {playerName}!</p>
-        {/* Display the new final score */}
-        <p className="text-4xl mt-8 text-white">Final Score: <span className="text-green-400">{finalScore}</span></p>
-        <p className="text-xl mt-2 text-gray-400">Total Time: {Math.floor(timeLeft / 60)}m {timeLeft % 60}s</p>
-        <button
-          onClick={() => { setGameState('welcome'); setFinalScore(0); }}
-          className="mt-8 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3 px-6 rounded-lg text-xl"
-        >
-          Play Again
-        </button>
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="medieval-card w-full max-w-2xl mx-auto p-8 text-center animate-bounce-in">
+          {/* Victory Crown */}
+          <div className="crown-icon text-8xl mb-6 animate-float">
+            👑
+          </div>
+          
+          {/* Victory Title */}
+          <h1 className="font-medieval text-4xl md:text-5xl font-bold text-royal-purple text-shadow-gold mb-4">
+            Quest Complete!
+          </h1>
+          
+          {/* Player Congratulations */}
+          <p className="text-xl md:text-2xl text-stone-gray mb-8">
+            Hail, <span className="text-gold font-medieval font-semibold">{playerName}</span>!
+            <br />
+            <span className="text-base italic">You have proven yourself a true champion!</span>
+          </p>
+          
+          {/* Score Display */}
+          <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="crown-icon text-2xl mb-2">🏆</div>
+                <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
+                <p className="text-3xl font-bold font-medieval text-gold">
+                  {finalScore.toLocaleString()}
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="crown-icon text-2xl mb-2">⏱️</div>
+                <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
+                <p className="text-xl font-medieval">
+                  {Math.floor(timeLeft / 60)}m {timeLeft % 60}s
+                </p>
+              </div>
+              <div className="text-center">
+                <div className="crown-icon text-2xl mb-2">⚡</div>
+                <p className="text-sm opacity-80 uppercase tracking-wide">Penalty</p>
+                <p className="text-xl font-medieval">
+                  {queryPenalty}
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          {/* Action Buttons */}
+          <div className="space-y-4">
+            <button
+              onClick={() => { setGameState('welcome'); setFinalScore(0); }}
+              className="btn-royal w-full md:w-auto text-xl py-4 px-8"
+            >
+              <span className="crown-icon mr-2">⚔️</span>
+              New Quest
+              <span className="crown-icon ml-2">⚔️</span>
+            </button>
+            
+            <p className="text-stone-gray text-sm italic">
+              "Every ending is a new beginning, noble warrior."
+            </p>
+          </div>
+        </div>
+        
+        {/* Leaderboard */}
         <Leaderboard />
       </div>
     );
   }
 
   return (
-    <div className="bg-gray-900 text-gray-200 min-h-screen font-mono flex flex-col items-center p-4">
-      <div className="w-full max-w-2xl">
+    <div className="min-h-screen p-4">
+      <div className="w-full max-w-4xl mx-auto">
         <Header 
           playerName={playerName}
           levelName={LEVEL_CONFIG[currentLevel].name}
@@ -146,14 +196,24 @@ function App() {
           penalty={queryPenalty}
           timeLeft={timeLeft}
         />
-        <Grid 
-          rows={BOARD_ROWS}
-          cols={BOARD_COLS}
-          onCellClick={handleCellClick}
-          isGameOver={isPaused} 
-          queryHistory={queryHistory}
-        />
-        <OutputLog output={output} />
+        
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Main Game Area */}
+          <div className="lg:col-span-2">
+            <Grid 
+              rows={BOARD_ROWS}
+              cols={BOARD_COLS}
+              onCellClick={handleCellClick}
+              isGameOver={isPaused} 
+              queryHistory={queryHistory}
+            />
+          </div>
+          
+          {/* Side Panel */}
+          <div className="lg:col-span-1">
+            <OutputLog output={output} />
+          </div>
+        </div>
       </div>
     </div>
   );

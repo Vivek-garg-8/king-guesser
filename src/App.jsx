@@ -137,11 +137,21 @@ function App() {
          
           {/* Score Display */}
           <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
-             <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
-             <p className="font-medieval text-5xl font-bold my-2">
-               {finalScore}
-             </p>
-           </div>
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="text-center">
+      <div className="crown-icon text-2xl mb-2">⏱️</div>
+      <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
+      <p className="text-xl font-medieval">
+        {Math.floor(timeLeft / 60)}m {timeLeft % 60}s
+      </p>
+    </div>
+    <div className="text-center">
+      <div className="crown-icon text-2xl mb-2">⚡</div>
+      <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
+      <p className="text-xl font-medieval">{finalScore}</p>
+    </div>
+  </div>
+</div>
          
           {/* Action Buttons */}
           <div className="space-y-4">

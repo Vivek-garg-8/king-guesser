@@ -36,6 +36,10 @@ function App() {
   const [timeLeft, setTimeLeft] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
 
+  // State for player's rank
+  const [playerRank, setPlayerRank] = useState(null);
+  const [isRankLoading, setIsRankLoading] = useState(true);
+
   // Track level 1 statistics
   useEffect(() => {
     if (currentLevel === 1 && queryHistory.length > 0) {
@@ -65,6 +69,7 @@ function App() {
     setFinalScore(0);
     setTimeLeft(0);
     setIsPaused(false);
+    setPlayerRank(null); // Reset rank on new game
     setupLevel(1);
     setGameState('playing');
   };
@@ -72,7 +77,6 @@ function App() {
   const handleInterstitialContinue = () => {
     setShowInterstitial(false);
     setIsPaused(false); // Resume the game
-    // Small delay to allow fade out animation
     setTimeout(() => {
       setupLevel(2);
     }, 200);
@@ -84,18 +88,40 @@ function App() {
     setupLevel(2);
   };
 
+  // Effect to save score and fetch rank when game is finished
   useEffect(() => {
     if (gameState === 'finished' && finalScore > 0) {
-      const saveScore = async () => {
-        const { error } = await supabase
+      const saveAndFetchRank = async () => {
+        setIsRankLoading(true);
+
+        // 1. Save the player's score
+        const { error: insertError } = await supabase
           .from('scores')
           .insert([{ player_name: playerName, score: finalScore }]);
-       
-        if (error) {
-          console.error('Error saving score:', error);
+        
+        if (insertError) {
+          console.error('Error saving score:', insertError);
+          setIsRankLoading(false);
+          return;
         }
+
+        // 2. Count how many players have a better (lower) score
+        const { count, error: countError } = await supabase
+          .from('scores')
+          .select('*', { count: 'exact', head: true }) // Efficiently count rows
+          .lt('score', finalScore);
+
+        if (countError) {
+          console.error('Error fetching rank:', countError);
+          setPlayerRank(null);
+        } else {
+          // Rank is the number of players with a better score + 1
+          setPlayerRank(count + 1);
+        }
+        setIsRankLoading(false);
       };
-      saveScore();
+
+      saveAndFetchRank();
     }
   }, [gameState, playerName, finalScore]);
 
@@ -122,14 +148,12 @@ function App() {
       if (currentLevel === 1) {
         setOutput(prev => [...prev, `Level 1 cleared! Preparing Level 2...`]);
         setIsPaused(true);
-        // Show interstitial after a brief delay
         setTimeout(() => {
           setShowInterstitial(true);
         }, 800);
       } else {
         setIsPaused(true);
         const timePenalty = timeLeft * TIME_PENALTY_PER_SECOND;
-        // The final score is the total penalty from clicks and time.
         const newFinalScore = Math.max(0, newQueryPenalty + timePenalty);
 
         setFinalScore(newFinalScore);
@@ -142,7 +166,6 @@ function App() {
   if (gameState === 'welcome') {
     return (
       <>
-        {/* The `loop` prop is true by default, which is what we want here. */}
         <FloatingParticles key="welcome" />
         <WelcomeScreen onGameStart={handleGameStart} />
         {showInterstitial && (
@@ -160,7 +183,6 @@ function App() {
   if (gameState === 'finished') {
     return (
       <>
-        {/* The `loop` prop is also true by default for the finished screen. */}
         <FloatingParticles key="finished" />
         <div className="min-h-screen flex flex-col items-center justify-center p-4">
           <div className="medieval-card w-full max-w-2xl mx-auto p-8 text-center animate-bounce-in">
@@ -178,8 +200,9 @@ function App() {
               <span className="text-base italic">You have proven yourself a true champion!</span>
             </p>
             
+            {/* Updated Score Display with Rank */}
             <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div className="text-center">
                   <div className="crown-icon text-2xl mb-2">⏱️</div>
                   <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
@@ -191,6 +214,17 @@ function App() {
                   <div className="crown-icon text-2xl mb-2">⚡</div>
                   <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
                   <p className="text-xl font-medieval">{finalScore}</p>
+                </div>
+                <div className="text-center">
+                  <div className="crown-icon text-2xl mb-2">🏆</div>
+                  <p className="text-sm opacity-80 uppercase tracking-wide">Your Rank</p>
+                  {isRankLoading ? (
+                    <p className="text-xl font-medieval animate-pulse">...</p>
+                  ) : (
+                    <p className="text-xl font-medieval">
+                      {playerRank ? `#${playerRank}` : 'N/A'}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -222,13 +256,8 @@ function App() {
   return (
     <>
       <div className="min-h-screen p-4">
-        {/* THIS IS THE FIX:
-          - key={currentLevel}: Forces the component to remount only when the level changes.
-          - loop={false}: Tells our updated component to play the animation only once.
-        */}
         <FloatingParticles key={currentLevel} loop={false} />
         
-        {/* Level Interstitial */}
         {showInterstitial && (
           <LevelInterstitial
             isVisible={showInterstitial}
@@ -248,7 +277,6 @@ function App() {
           />
          
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Main Game Area */}
             <div className="lg:col-span-2">
               <Grid 
                 rows={BOARD_ROWS}
@@ -259,7 +287,6 @@ function App() {
               />
             </div>
            
-            {/* Side Panel */}
             <div className="lg:col-span-1">
               <OutputLog output={output} />
             </div>

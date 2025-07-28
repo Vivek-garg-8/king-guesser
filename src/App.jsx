@@ -141,7 +141,6 @@ function App() {
              <p className="font-medieval text-5xl font-bold my-2">
                {finalScore}
              </p>
-             <p className="text-sm italic opacity-80">(Lower Score is Better)</p>
            </div>
          
           {/* Action Buttons */}

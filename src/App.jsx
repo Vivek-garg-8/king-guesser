@@ -147,7 +147,7 @@ function App() {
     </div>
     <div className="text-center">
       <div className="crown-icon text-2xl mb-2">⚡</div>
-      <p className="text-sm opacity-80 uppercase tracking-wide">Final Score hi</p>
+      <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
       <p className="text-xl font-medieval">{finalScore}</p>
     </div>
   </div>

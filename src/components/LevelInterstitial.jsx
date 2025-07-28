@@ -164,13 +164,6 @@ function LevelInterstitial({
                     <span className="button-text">Tap to Continue</span>
                     <span className="button-icon">⚔️</span>
                 </button>
-                <button 
-                    className="skip-button"
-                    onClick={handleSkip}
-                    aria-label="Skip level transition"
-                >
-                    Skip
-                </button>
             </div>
         )}
       </div>

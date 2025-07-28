@@ -1,10 +1,6 @@
 import React from 'react';
 
-// The component now accepts a "loop" prop, which defaults to true
 function FloatingParticles({ loop = true }) {
-  // The animation name is determined by the loop prop
-  const animationName = loop ? 'float-up-infinite' : 'float-up-once';
-
   return (
     <>
       <div className="floating-particles">
@@ -15,7 +11,7 @@ function FloatingParticles({ loop = true }) {
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              animationName: animationName, // Apply the correct animation
+              animationIterationCount: loop ? 'infinite' : '1',
               animationDelay: `${Math.random() * 5}s`,
               animationDuration: `${5 + Math.random() * 5}s`,
             }}
@@ -41,14 +37,16 @@ function FloatingParticles({ loop = true }) {
           height: 4px;
           background: #ffd700;
           border-radius: 50%;
-          opacity: 0;
+          opacity: 0; /* Start invisible */
           box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
-          /* The animation is now defined in keyframes and applied via a style prop */
+          
+          /* The animation is now defined once and controlled by the iteration-count style prop */
+          animation-name: float-up;
           animation-timing-function: linear;
-          animation-fill-mode: forwards; /* Ensures the particle stays gone after one play */
+          /* This makes the particle stay gone after its animation finishes (for the one-shot case) */
+          animation-fill-mode: forwards; 
         }
 
-        /* Renamed to a base animation */
         @keyframes float-up {
           0% {
             transform: translateY(0);
@@ -66,25 +64,5 @@ function FloatingParticles({ loop = true }) {
     </>
   );
 }
-
-// We will define the animations directly in the component's style tag for clarity
-const GlobalStyles = () => (
-  <style jsx global>{`
-    @keyframes float-up-infinite {
-      0% { transform: translateY(0); opacity: 0; }
-      10%, 90% { opacity: 0.7; }
-      100% { transform: translateY(-150px); opacity: 0; }
-    }
-    @keyframes float-up-once {
-      0% { transform: translateY(0); opacity: 0; }
-      10%, 90% { opacity: 0.7; }
-      100% { transform: translateY(-150px); opacity: 0; }
-    }
-    .particle {
-      animation-name: float-up-infinite;
-    }
-  `}</style>
-);
-
 
 export default FloatingParticles;

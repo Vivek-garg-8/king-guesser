@@ -4,7 +4,7 @@ function FloatingParticles() {
   return (
     <>
       <div className="floating-particles">
-        {[...Array(20)].map((_, i) => (
+        {[...Array(100)].map((_, i) => (
           <div
             key={i}
             className="particle"

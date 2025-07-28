@@ -51,20 +51,6 @@ function Header({ playerName, levelName, description, penalty, timeLeft }) {
               </div>
             </div>
           </div>
-          
-          <div className="medieval-card px-4 py-2 bg-opacity-80">
-            <div className="flex items-center space-x-2">
-              <span className="crown-icon text-lg">🎯</span>
-              <div className="text-center">
-                <p className="text-xs text-stone-gray font-medieval uppercase tracking-wide">
-                  Base Score
-                </p>
-                <p className="text-xl font-bold text-success-green font-medieval">
-                  20,000
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </header>

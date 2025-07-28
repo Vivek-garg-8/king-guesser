@@ -131,7 +131,7 @@ function App() {
           
           {/* Player Congratulations */}
           <p className="text-xl md:text-2xl text-stone-gray mb-8">
-            Hail, <span className="text-gold font-medieval font-semibold">{playerName}</span>!
+            Hail, <span className="font-medieval font-semibold">{playerName}</span>!
             <br />
             <span className="text-base italic">You have proven yourself a true champion!</span>
           </p>

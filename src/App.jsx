@@ -1,3 +1,219 @@
+// import { useState, useEffect, useCallback } from 'react';
+// import Header from './components/Header';
+// import OutputLog from './components/OutputLog';
+// import Grid from './components/Grid';
+// import WelcomeScreen from './components/WelcomeScreen';
+// import { supabase } from './supabaseClient';
+// import Leaderboard from './components/Leaderboard';
+
+
+// const LEVEL_CONFIG = {
+//   1: {
+//     name: "Level 1: The Lone King", items: 1, penalty: 5, itemName: "king",description: "Find the single hidden king. Each click adds 5 penalty points."
+//   },
+//   2: {
+//     name: "Level 2: The Royal Pair", items: 2, penalty: 20, itemName: "king",description: "Find one of two hidden kings. Each click adds 20 penalty points."
+//   },
+// };
+// const BOARD_ROWS = 10;
+// const BOARD_COLS = 10;
+// const BASE_SCORE = 20000;
+// const TIME_PENALTY_PER_SECOND = 10;
+
+// function App() {
+//   const [gameState, setGameState] = useState('welcome');
+//   const [playerName, setPlayerName] = useState('');
+//   const [currentLevel, setCurrentLevel] = useState(1);
+
+//   const [output, setOutput] = useState([]);
+//   const [hiddenItems, setHiddenItems] = useState([]);
+//   const [queryHistory, setQueryHistory] = useState([]);
+  
+//   const [queryPenalty, setQueryPenalty] = useState(0); 
+//   const [finalScore, setFinalScore] = useState(0);
+//   const [timeLeft, setTimeLeft] = useState(0);
+//   const [isPaused, setIsPaused] = useState(true);
+
+//   const setupLevel = useCallback((level) => {
+//     const config = LEVEL_CONFIG[level];
+//     const newItems = [];
+//     while (newItems.length < config.items) {
+//       const r = Math.floor(Math.random() * BOARD_ROWS) + 1;
+//       const c = Math.floor(Math.random() * BOARD_COLS) + 1;
+//       if (!newItems.some(i => i.r === r && i.c === c)) newItems.push({ r, c });
+//     }
+//     setHiddenItems(newItems);
+//     setQueryHistory([]);
+//     setOutput([`Starting ${config.name}. Find the hidden ${config.itemName}!`]);
+//     setCurrentLevel(level);
+//   }, []);
+
+//   const handleGameStart = (name) => {
+//     setPlayerName(name);
+//     setQueryPenalty(0);
+//     setFinalScore(0);
+//     setTimeLeft(0);
+//     setIsPaused(false);
+//     setupLevel(1);
+//     setGameState('playing');
+//   };
+
+//   useEffect(() => {
+//     if (gameState === 'finished' && finalScore > 0) {
+//       const saveScore = async () => {
+//         const { error } = await supabase
+//           .from('scores')
+//           .insert([{ player_name: playerName, score: finalScore }]);
+        
+//         if (error) {
+//           console.error('Error saving score:', error);
+//         }
+//       };
+//       saveScore();
+//     }
+//   }, [gameState, playerName, finalScore]);
+
+//   useEffect(() => {
+//     if (isPaused) return;
+//     const timerId = setInterval(() => setTimeLeft(t => t + 1), 1000);
+//     return () => clearInterval(timerId);
+//   }, [isPaused]);
+
+//   // --- Click Handling Logic ---
+//   const handleCellClick = (r, c) => {
+//     if (isPaused || queryHistory.some(h => h.r === r && h.c === c)) return;
+
+//     const config = LEVEL_CONFIG[currentLevel];
+//     // Update query penalty on every click
+//     setQueryPenalty(prev => prev + config.penalty);
+
+//     const distances = hiddenItems.map(item => Math.abs(item.r - r) + Math.abs(item.c - c));
+//     const minDistance = Math.min(...distances);
+    
+//     setQueryHistory(prev => [...prev, { r, c, distance: minDistance }]);
+
+//     if (minDistance === 0) {
+//       if (currentLevel === 1) {
+//         setOutput(prev => [...prev, `Level 1 cleared! Advancing to Level 2...`]);
+//         setupLevel(2);
+//       } else {
+//         setIsPaused(true);
+//         const timePenalty = timeLeft * TIME_PENALTY_PER_SECOND;
+//         const totalQueryPenalty = queryPenalty + config.penalty; 
+//         const newFinalScore = Math.max(0, timePenalty + totalQueryPenalty);
+
+//         setFinalScore(newFinalScore);
+//         setGameState('finished');
+//         setOutput(prev => [...prev, `Congratulations, ${playerName}! You found all the kings!`]);
+//       }
+//     }
+//   };
+  
+//   if (gameState === 'welcome') {
+//     return (
+//       <WelcomeScreen onGameStart={handleGameStart} />
+//     );
+//   }
+
+//   if (gameState === 'finished') {
+//     return (
+//       <div className="min-h-screen flex flex-col items-center justify-center p-4">
+//         <div className="medieval-card w-full max-w-2xl mx-auto p-8 text-center animate-bounce-in">
+//           {/* Victory Crown */}
+//           <div className="crown-icon text-8xl mb-6 animate-float">
+//             👑
+//           </div>
+          
+//           {/* Victory Title */}
+//           <h1 className="font-medieval text-4xl md:text-5xl font-bold text-royal-purple text-shadow-gold mb-4">
+//             Quest Complete!
+//           </h1>
+          
+//           {/* Player Congratulations */}
+//           <p className="text-xl md:text-2xl text-stone-gray mb-8">
+//             Hail, <span className="font-medieval font-semibold">{playerName}</span>!
+//             <br />
+//             <span className="text-base italic">You have proven yourself a true champion!</span>
+//           </p>
+          
+//           {/* Score Display */}
+//           <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
+//             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+//               <div className="text-center">
+//                 <div className="crown-icon text-2xl mb-2">⏱️</div>
+//                 <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
+//                 <p className="text-xl font-medieval">
+//                   {Math.floor(timeLeft / 60)}m {timeLeft % 60}s
+//                 </p>
+//               </div>
+//               <div className="text-center">
+//                 <div className="crown-icon text-2xl mb-2">⚡</div>
+//                 <p className="text-sm opacity-80 uppercase tracking-wide">Penalty</p>
+//                 <p className="text-xl font-medieval">
+//                   {queryPenalty}
+//                 </p>
+//               </div>
+//             </div>
+//           </div>
+          
+//           {/* Action Buttons */}
+//           <div className="space-y-4">
+//             <button
+//               onClick={() => { setGameState('welcome'); setFinalScore(0); }}
+//               className="btn-royal w-full md:w-auto text-xl py-4 px-8"
+//             >
+//               <span className="crown-icon mr-2">⚔️</span>
+//               New Quest
+//               <span className="crown-icon ml-2">⚔️</span>
+//             </button>
+            
+//             <p className="text-stone-gray text-sm italic">
+//               "Every ending is a new beginning, noble warrior."
+//             </p>
+//           </div>
+//         </div>
+        
+//         {/* Leaderboard */}
+//         <Leaderboard />
+//       </div>
+//     );
+//   }
+
+//   return (
+//     <div className="min-h-screen p-4">
+//       <div className="w-full max-w-4xl mx-auto">
+//         <Header 
+//           playerName={playerName}
+//           levelName={LEVEL_CONFIG[currentLevel].name}
+//           description={LEVEL_CONFIG[currentLevel].description}
+//           penalty={queryPenalty}
+//           timeLeft={timeLeft}
+//         />
+        
+//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//           {/* Main Game Area */}
+//           <div className="lg:col-span-2">
+//             <Grid 
+//               rows={BOARD_ROWS}
+//               cols={BOARD_COLS}
+//               onCellClick={handleCellClick}
+//               isGameOver={isPaused} 
+//               queryHistory={queryHistory}
+//             />
+//           </div>
+          
+//           {/* Side Panel */}
+//           <div className="lg:col-span-1">
+//             <OutputLog output={output} />
+//           </div>
+//         </div>
+//       </div>
+//     </div>
+//   );
+// }
+
+// export default App;
+
 import { useState, useEffect, useCallback } from 'react';
 import Header from './components/Header';
 import OutputLog from './components/OutputLog';
@@ -28,7 +244,7 @@ function App() {
   const [output, setOutput] = useState([]);
   const [hiddenItems, setHiddenItems] = useState([]);
   const [queryHistory, setQueryHistory] = useState([]);
-  
+
   const [queryPenalty, setQueryPenalty] = useState(0); 
   const [finalScore, setFinalScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
@@ -64,7 +280,7 @@ function App() {
         const { error } = await supabase
           .from('scores')
           .insert([{ player_name: playerName, score: finalScore }]);
-        
+       
         if (error) {
           console.error('Error saving score:', error);
         }
@@ -74,22 +290,22 @@ function App() {
   }, [gameState, playerName, finalScore]);
 
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || gameState !== 'playing') return;
     const timerId = setInterval(() => setTimeLeft(t => t + 1), 1000);
     return () => clearInterval(timerId);
-  }, [isPaused]);
+  }, [isPaused, gameState]);
 
   // --- Click Handling Logic ---
   const handleCellClick = (r, c) => {
     if (isPaused || queryHistory.some(h => h.r === r && h.c === c)) return;
 
     const config = LEVEL_CONFIG[currentLevel];
-    // Update query penalty on every click
-    setQueryPenalty(prev => prev + config.penalty);
+    const newQueryPenalty = queryPenalty + config.penalty;
+    setQueryPenalty(newQueryPenalty);
 
     const distances = hiddenItems.map(item => Math.abs(item.r - r) + Math.abs(item.c - c));
     const minDistance = Math.min(...distances);
-    
+   
     setQueryHistory(prev => [...prev, { r, c, distance: minDistance }]);
 
     if (minDistance === 0) {
@@ -99,8 +315,8 @@ function App() {
       } else {
         setIsPaused(true);
         const timePenalty = timeLeft * TIME_PENALTY_PER_SECOND;
-        const totalQueryPenalty = queryPenalty + config.penalty; 
-        const newFinalScore = Math.max(0, timePenalty + totalQueryPenalty);
+        // The final score is the total penalty from clicks and time.
+        const newFinalScore = Math.max(0, newQueryPenalty + timePenalty);
 
         setFinalScore(newFinalScore);
         setGameState('finished');
@@ -108,7 +324,7 @@ function App() {
       }
     }
   };
-  
+ 
   if (gameState === 'welcome') {
     return (
       <WelcomeScreen onGameStart={handleGameStart} />
@@ -123,39 +339,28 @@ function App() {
           <div className="crown-icon text-8xl mb-6 animate-float">
             👑
           </div>
-          
+         
           {/* Victory Title */}
           <h1 className="font-medieval text-4xl md:text-5xl font-bold text-royal-purple text-shadow-gold mb-4">
             Quest Complete!
           </h1>
-          
+         
           {/* Player Congratulations */}
           <p className="text-xl md:text-2xl text-stone-gray mb-8">
             Hail, <span className="font-medieval font-semibold">{playerName}</span>!
             <br />
             <span className="text-base italic">You have proven yourself a true champion!</span>
           </p>
-          
+         
           {/* Score Display */}
           <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="text-center">
-                <div className="crown-icon text-2xl mb-2">⏱️</div>
-                <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
-                <p className="text-xl font-medieval">
-                  {Math.floor(timeLeft / 60)}m {timeLeft % 60}s
-                </p>
-              </div>
-              <div className="text-center">
-                <div className="crown-icon text-2xl mb-2">⚡</div>
-                <p className="text-sm opacity-80 uppercase tracking-wide">Penalty</p>
-                <p className="text-xl font-medieval">
-                  {queryPenalty}
-                </p>
-              </div>
-            </div>
-          </div>
-          
+             <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
+             <p className="font-medieval text-5xl font-bold my-2">
+               {finalScore}
+             </p>
+             <p className="text-sm italic opacity-80">(Lower Score is Better)</p>
+           </div>
+         
           {/* Action Buttons */}
           <div className="space-y-4">
             <button
@@ -166,18 +371,21 @@ function App() {
               New Quest
               <span className="crown-icon ml-2">⚔️</span>
             </button>
-            
+           
             <p className="text-stone-gray text-sm italic">
               "Every ending is a new beginning, noble warrior."
             </p>
           </div>
         </div>
-        
+       
         {/* Leaderboard */}
         <Leaderboard />
       </div>
     );
   }
+
+  // Calculate the net penalty for display during the game
+  const netPenalty = queryPenalty + (timeLeft * TIME_PENALTY_PER_SECOND);
 
   return (
     <div className="min-h-screen p-4">
@@ -186,10 +394,10 @@ function App() {
           playerName={playerName}
           levelName={LEVEL_CONFIG[currentLevel].name}
           description={LEVEL_CONFIG[currentLevel].description}
-          penalty={queryPenalty}
+          penalty={netPenalty}
           timeLeft={timeLeft}
         />
-        
+       
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Main Game Area */}
           <div className="lg:col-span-2">
@@ -201,7 +409,7 @@ function App() {
               queryHistory={queryHistory}
             />
           </div>
-          
+         
           {/* Side Panel */}
           <div className="lg:col-span-1">
             <OutputLog output={output} />

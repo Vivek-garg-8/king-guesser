@@ -25,7 +25,7 @@ function WelcomeScreen({ onGameStart }) {
           </h1>
           
           {/* Subtitle */}
-          <p className="font-medieval text-xl text-gold mb-6">
+          <p className="font-medieval text-xl mb-6">
             Medieval Quest
           </p>
           

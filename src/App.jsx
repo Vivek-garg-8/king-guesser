@@ -186,7 +186,7 @@ function App() {
           playerName={playerName}
           levelName={LEVEL_CONFIG[currentLevel].name}
           description={LEVEL_CONFIG[currentLevel].description}
-          penalty={finalScore}
+          penalty={queryPenalty}
           timeLeft={timeLeft}
         />
         

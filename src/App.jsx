@@ -138,14 +138,7 @@ function App() {
           
           {/* Score Display */}
           <div className="bg-royal-gradient p-6 rounded-lg mb-8 text-white">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="text-center">
-                <div className="crown-icon text-2xl mb-2">🏆</div>
-                <p className="text-sm opacity-80 uppercase tracking-wide">Final Score</p>
-                <p className="text-3xl font-bold font-medieval text-gold">
-                  {finalScore.toLocaleString()}
-                </p>
-              </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div className="text-center">
                 <div className="crown-icon text-2xl mb-2">⏱️</div>
                 <p className="text-sm opacity-80 uppercase tracking-wide">Total Time</p>
@@ -193,7 +186,7 @@ function App() {
           playerName={playerName}
           levelName={LEVEL_CONFIG[currentLevel].name}
           description={LEVEL_CONFIG[currentLevel].description}
-          penalty={queryPenalty}
+          penalty={finalScore}
           timeLeft={timeLeft}
         />
         

@@ -13,49 +13,59 @@ function LevelInterstitial({
   level1Stats = { correct: 0, incorrect: 0 },
   onSkip 
 }) {
-  const [showLoader, setShowLoader] = useState(true);
-  const [showButtons, setShowButtons] = useState(false);
   const [selectedFact, setSelectedFact] = useState('');
   const [progress, setProgress] = useState(0);
   const [showRecap, setShowRecap] = useState(true);
+  const [showSkip, setShowSkip] = useState(false);
 
-  // ... (Your useEffect and handler logic remains the same)
   useEffect(() => {
     if (!isVisible) return;
-    setShowLoader(true);
-    setShowButtons(false);
+
+    // Reset state when interstitial becomes visible
     setProgress(0);
     setShowRecap(true);
+    setShowSkip(false);
+    
+    // Select a random king fact
     const randomFact = KING_FACTS[Math.floor(Math.random() * KING_FACTS.length)];
     setSelectedFact(randomFact);
+
+    // Play entrance chime sound (simulated with console for now)
     console.log('🔊 Crown chime sound');
-    const recapTimer = setTimeout(() => {
-      setShowRecap(false);
-    }, 1000);
+
+    // Show the skip button after a short delay
+    const skipTimer = setTimeout(() => {
+      setShowSkip(true);
+    }, 500);
+
+    // Animate the progress bar
     const progressTimer = setTimeout(() => {
       setProgress(100);
     }, 100);
-    const loaderTimer = setTimeout(() => {
-      setShowLoader(false);
-      setShowButtons(true);
-    }, 1500);
-    return () => {
-      clearTimeout(recapTimer);
-      clearTimeout(progressTimer);
-      clearTimeout(loaderTimer);
-    };
-  }, [isVisible]);
 
-  const handleContinue = () => {
-    console.log('🔊 Soft whoosh sound');
-    onContinue();
-  };
+    // Hide the level 1 recap after it has been shown for a bit
+    const recapTimer = setTimeout(() => {
+      setShowRecap(false);
+    }, 2000);
+
+    // Automatically continue to the next level after the animation has played
+    const autoContinueTimer = setTimeout(() => {
+      onContinue();
+    }, 3000); // Total duration before automatically moving on
+
+    // Cleanup timers on component unmount or when visibility changes
+    return () => {
+      clearTimeout(skipTimer);
+      clearTimeout(progressTimer);
+      clearTimeout(recapTimer);
+      clearTimeout(autoContinueTimer);
+    };
+  }, [isVisible, onContinue]);
 
   const handleSkip = () => {
     console.log('🔊 Soft whoosh sound');
     onSkip();
   };
-
 
   if (!isVisible) return null;
 
@@ -70,7 +80,7 @@ function LevelInterstitial({
       <div className="progress-container">
         <div 
           className="progress-bar" 
-          style={{ width: `${progress}%` }}
+          style={{ width: `${progress}%`, transition: 'width 3s ease-out' }}
           role="progressbar"
           aria-valuenow={progress}
           aria-valuemin="0"
@@ -78,6 +88,17 @@ function LevelInterstitial({
           aria-label="Level transition progress"
         />
       </div>
+
+      {/* Skip Button */}
+      {showSkip && (
+        <button 
+          className="skip-button"
+          onClick={handleSkip}
+          aria-label="Skip level transition"
+        >
+          Skip
+        </button>
+      )}
 
       {/* Level 1 Recap */}
       {showRecap && (
@@ -100,7 +121,6 @@ function LevelInterstitial({
 
       {/* Main Content */}
       <div className="interstitial-content">
-        {/* Main Heading */}
         <h1 
           id="level-transition-title"
           className="level-title"
@@ -108,42 +128,22 @@ function LevelInterstitial({
           Moving to Level 2
         </h1>
 
-        {/* Animated Loader */}
-        {showLoader && (
-          <div className="loader-container" aria-label="Loading next level">
-            <div className="crown-loader">
-              <span className="crown-icon">👑</span>
-            </div>
-            <p className="loading-text">Preparing the Royal Challenge...</p>
+        <div className="loader-container" aria-label="Loading next level">
+          <div className="crown-loader">
+            <span className="crown-icon">👑</span>
           </div>
-        )}
+          <p className="loading-text">Preparing the Royal Challenge...</p>
+        </div>
 
-        {/* King Fact */}
-        {!showLoader && (
-          <div className="fact-container">
-            <div className="fact-icon">📜</div>
-            <p 
-              id="level-transition-description"
-              className="king-fact"
-            >
-              {selectedFact}
-            </p>
-          </div>
-        )}
-
-        {/* Buttons Container */}
-        {showButtons && (
-            <div className="button-container">
-                <button 
-                    className="continue-button"
-                    onClick={handleContinue}
-                    aria-label="Continue to Level 2"
-                >
-                    <span className="button-text">Tap to Continue</span>
-                    <span className="button-icon">⚔️</span>
-                </button>
-            </div>
-        )}
+        <div className="fact-container">
+          <div className="fact-icon">📜</div>
+          <p 
+            id="level-transition-description"
+            className="king-fact"
+          >
+            {selectedFact}
+          </p>
+        </div>
       </div>
 
       <style jsx>{`
@@ -171,10 +171,6 @@ function LevelInterstitial({
           overflow: hidden;
         }
 
-        /* --- REMOVED STYLES --- */
-        /* The .floating-particles and .particle styles were here. */
-        /* They are now correctly handled by the FloatingParticles component. */
-        
         .progress-container {
           position: absolute;
           top: 0;
@@ -188,8 +184,30 @@ function LevelInterstitial({
         .progress-bar {
           height: 100%;
           background: linear-gradient(90deg, #ffd700, #ffed4e);
-          transition: width 1.5s ease-out;
           box-shadow: 0 0 10px rgba(255, 215, 0, 0.6);
+        }
+
+        .skip-button {
+          position: absolute;
+          top: 20px;
+          right: 20px;
+          background: transparent;
+          border: 1px solid rgba(255, 215, 0, 0.5);
+          color: #ffd700;
+          padding: 8px 16px;
+          border-radius: 20px;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          z-index: 10;
+          font-family: 'Crimson Text', serif;
+          animation: fadeIn 0.5s ease-out 0.5s both;
+        }
+
+        .skip-button:hover {
+          background: rgba(255, 215, 0, 0.1);
+          border-color: #ffd700;
+          transform: translateY(-1px);
         }
 
         .level-recap {
@@ -199,7 +217,7 @@ function LevelInterstitial({
           border: 2px solid #b8860b;
           border-radius: 12px;
           padding: 16px 24px;
-          animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-out 0.5s forwards;
+          animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-out 1.5s forwards;
           z-index: 10;
         }
 
@@ -216,24 +234,19 @@ function LevelInterstitial({
           gap: 4px;
         }
 
-        .stat-icon {
-          font-size: 20px;
-        }
-
+        .stat-icon { font-size: 20px; }
         .stat-value {
           font-size: 24px;
           font-weight: bold;
           color: #2d1b69;
           font-family: 'Cinzel', serif;
         }
-
         .stat-label {
           font-size: 12px;
           color: #4a4a4a;
           text-transform: uppercase;
           letter-spacing: 1px;
         }
-
         .stat-divider {
           font-size: 24px;
           color: #b8860b;
@@ -288,7 +301,7 @@ function LevelInterstitial({
           flex-direction: column;
           justify-content: center;
           align-items: center;
-          animation: fadeInUp 0.6s ease-out;
+          animation: fadeInUp 0.6s ease-out 1s both;
         }
 
         .fact-icon {
@@ -307,43 +320,19 @@ function LevelInterstitial({
           text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.8);
         }
 
-        .button-container {
-            margin-top: 40px;
-            display: flex;
-            flex-direction: column-reverse;
-            align-items: center;
-            gap: 16px;
-            animation: fadeInUp 0.6s ease-out;
-        }
-
-        .continue-button {
-          background: linear-gradient(135deg, #ffd700 0%, #ffed4e 50%, #ffd700 100%);
-          border: 3px solid #b8860b;
-          color: #2d1b69;
-          font-family: 'Cinzel', serif;
-          font-weight: 600;
-          font-size: 1.2rem;
-          padding: 16px 32px;
-          border-radius: 12px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          position: relative;
-          overflow: hidden;
-          min-width: 220px;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 12px;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-          box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
-        }
-
-        /* ... (rest of the styles are unchanged) */
-        
+        /* Animations */
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        @keyframes rotate { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+        @keyframes glow { from { filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); } to { filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)); } }
+        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-10px); } }
       `}</style>
     </div>
   );
 }
 
-export default LevelInterstitial;
+export default React.memo(LevelInterstitial);

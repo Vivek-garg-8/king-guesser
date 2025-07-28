@@ -11,7 +11,7 @@ function Leaderboard() {
       const { data, error } = await supabase
         .from('scores')
         .select('player_name, score')
-        .order('score', { ascending: false }) 
+        .order('score', { ascending: true }) 
         .limit(10);
 
       if (error) {

@@ -3,6 +3,7 @@ import Header from './components/Header';
 import OutputLog from './components/OutputLog';
 import Grid from './components/Grid';
 import WelcomeScreen from './components/WelcomeScreen';
+import LevelInterstitial from './components/LevelInterstitial';
 import { supabase } from './supabaseClient';
 import Leaderboard from './components/Leaderboard';
 
@@ -23,6 +24,8 @@ function App() {
   const [gameState, setGameState] = useState('welcome');
   const [playerName, setPlayerName] = useState('');
   const [currentLevel, setCurrentLevel] = useState(1);
+  const [showInterstitial, setShowInterstitial] = useState(false);
+  const [level1Stats, setLevel1Stats] = useState({ correct: 0, incorrect: 0 });
 
   const [output, setOutput] = useState([]);
   const [hiddenItems, setHiddenItems] = useState([]);
@@ -32,6 +35,15 @@ function App() {
   const [finalScore, setFinalScore] = useState(0);
   const [timeLeft, setTimeLeft] = useState(0);
   const [isPaused, setIsPaused] = useState(true);
+
+  // Track level 1 statistics
+  useEffect(() => {
+    if (currentLevel === 1 && queryHistory.length > 0) {
+      const correctGuesses = queryHistory.filter(h => h.distance === 0).length;
+      const incorrectGuesses = queryHistory.length - correctGuesses;
+      setLevel1Stats({ correct: correctGuesses, incorrect: incorrectGuesses });
+    }
+  }, [queryHistory, currentLevel]);
 
   const setupLevel = useCallback((level) => {
     const config = LEVEL_CONFIG[level];
@@ -55,6 +67,19 @@ function App() {
     setIsPaused(false);
     setupLevel(1);
     setGameState('playing');
+  };
+
+  const handleInterstitialContinue = () => {
+    setShowInterstitial(false);
+    // Small delay to allow fade out animation
+    setTimeout(() => {
+      setupLevel(2);
+    }, 200);
+  };
+
+  const handleInterstitialSkip = () => {
+    setShowInterstitial(false);
+    setupLevel(2);
   };
 
   useEffect(() => {
@@ -93,8 +118,12 @@ function App() {
 
     if (minDistance === 0) {
       if (currentLevel === 1) {
-        setOutput(prev => [...prev, `Level 1 cleared! Advancing to Level 2...`]);
-        setupLevel(2);
+        setOutput(prev => [...prev, `Level 1 cleared! Preparing Level 2...`]);
+        setIsPaused(true);
+        // Show interstitial after a brief delay
+        setTimeout(() => {
+          setShowInterstitial(true);
+        }, 800);
       } else {
         setIsPaused(true);
         const timePenalty = timeLeft * TIME_PENALTY_PER_SECOND;
@@ -110,7 +139,17 @@ function App() {
  
   if (gameState === 'welcome') {
     return (
-      <WelcomeScreen onGameStart={handleGameStart} />
+      <>
+        <WelcomeScreen onGameStart={handleGameStart} />
+        {showInterstitial && (
+          <LevelInterstitial
+            isVisible={showInterstitial}
+            onContinue={handleInterstitialContinue}
+            onSkip={handleInterstitialSkip}
+            level1Stats={level1Stats}
+          />
+        )}
+      </>
     );
   }
 
@@ -181,6 +220,16 @@ function App() {
 
   return (
     <div className="min-h-screen p-4">
+      {/* Level Interstitial */}
+      {showInterstitial && (
+        <LevelInterstitial
+          isVisible={showInterstitial}
+          onContinue={handleInterstitialContinue}
+          onSkip={handleInterstitialSkip}
+          level1Stats={level1Stats}
+        />
+      )}
+      
       <div className="w-full max-w-4xl mx-auto">
         <Header 
           playerName={playerName}

@@ -100,25 +100,6 @@ function LevelInterstitial({
         </button>
       )}
 
-      {/* Level 1 Recap */}
-      {showRecap && (
-        <div className="level-recap">
-          <div className="recap-stats">
-            <div className="stat-item">
-              <span className="stat-icon">✅</span>
-              <span className="stat-value">{level1Stats.correct}</span>
-              <span className="stat-label">Correct</span>
-            </div>
-            <div className="stat-divider">|</div>
-            <div className="stat-item">
-              <span className="stat-icon">❌</span>
-              <span className="stat-value">{level1Stats.incorrect}</span>
-              <span className="stat-label">Incorrect</span>
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Main Content */}
       <div className="interstitial-content">
         <h1 
@@ -127,6 +108,25 @@ function LevelInterstitial({
         >
           Moving to Level 2
         </h1>
+
+        {/* Level 1 Recap - MOVED HERE */}
+        {showRecap && (
+          <div className="level-recap">
+            <div className="recap-stats">
+              <div className="stat-item">
+                <span className="stat-icon">✅</span>
+                <span className="stat-value">{level1Stats.correct}</span>
+                <span className="stat-label">Correct</span>
+              </div>
+              <div className="stat-divider">|</div>
+              <div className="stat-item">
+                <span className="stat-icon">❌</span>
+                <span className="stat-value">{level1Stats.incorrect}</span>
+                <span className="stat-label">Incorrect</span>
+              </div>
+            </div>
+          </div>
+        )}
 
         <div className="loader-container" aria-label="Loading next level">
           <div className="crown-loader">
@@ -210,15 +210,15 @@ function LevelInterstitial({
           transform: translateY(-1px);
         }
 
+        /* UPDATED STYLES FOR LEVEL RECAP */
         .level-recap {
-          position: absolute;
-          top: 80px;
           background: rgba(244, 228, 188, 0.9);
           border: 2px solid #b8860b;
           border-radius: 12px;
-          padding: 16px 24px;
-          animation: slideDown 0.5s ease-out, fadeOut 0.5s ease-out 1.5s forwards;
-          z-index: 10;
+          padding: 12px 20px;
+          animation: fadeIn 0.5s ease-out 0.5s both, fadeOut 0.5s ease-out 1.5s forwards;
+          display: inline-block;
+          margin-bottom: 20px;
         }
 
         .recap-stats {
@@ -267,7 +267,7 @@ function LevelInterstitial({
           font-size: clamp(2.5rem, 5vw, 4rem);
           font-weight: 600;
           color: #ffd700;
-          margin-bottom: 40px;
+          margin-bottom: 20px; /* Adjusted margin */
           text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.4);
           letter-spacing: 2px;
         }
@@ -323,7 +323,6 @@ function LevelInterstitial({
         /* Animations */
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideUp { from { opacity: 0; transform: translateY(50px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
         @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }

@@ -100,7 +100,7 @@ function App() {
         setIsPaused(true);
         const timePenalty = timeLeft * TIME_PENALTY_PER_SECOND;
         const totalQueryPenalty = queryPenalty + config.penalty; 
-        const newFinalScore = Math.max(0, BASE_SCORE - timePenalty - totalQueryPenalty);
+        const newFinalScore = Math.max(0, timePenalty + totalQueryPenalty);
 
         setFinalScore(newFinalScore);
         setGameState('finished');

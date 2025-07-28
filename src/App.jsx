@@ -256,7 +256,7 @@ function App() {
   return (
     <>
       <div className="min-h-screen p-4">
-        <FloatingParticles key={currentLevel} loop={false} />
+        <FloatingParticles key={currentLevel} loop={true} />
         
         {showInterstitial && (
           <LevelInterstitial

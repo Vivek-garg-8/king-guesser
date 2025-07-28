@@ -142,6 +142,7 @@ function App() {
   if (gameState === 'welcome') {
     return (
       <>
+        <FloatingParticles />
         <WelcomeScreen onGameStart={handleGameStart} />
         {showInterstitial && (
           <LevelInterstitial

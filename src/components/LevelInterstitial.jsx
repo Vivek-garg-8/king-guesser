@@ -72,9 +72,9 @@ function LevelInterstitial({
 
   return (
     <div className="interstitial-overlay" role="dialog" aria-labelledby="level-transition-title" aria-describedby="level-transition-description">
-      <FloatingParticles />
       {/* Animated Background */}
       <div className="interstitial-background">
+        <FloatingParticles />
       </div>
 
       {/* Progress Bar */}

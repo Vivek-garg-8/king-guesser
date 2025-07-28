@@ -224,7 +224,9 @@ function App() {
   const netPenalty = queryPenalty + (timeLeft * TIME_PENALTY_PER_SECOND);
 
   return (
+    <>
     <div className="min-h-screen p-4">
+      <FloatingParticles />
       {/* Level Interstitial */}
       {showInterstitial && (
         <LevelInterstitial
@@ -263,6 +265,7 @@ function App() {
         </div>
       </div>
     </div>
+    </>
   );
 }
 

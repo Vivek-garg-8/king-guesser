@@ -6,7 +6,7 @@ import WelcomeScreen from './components/WelcomeScreen';
 import LevelInterstitial from './components/LevelInterstitial';
 import { supabase } from './supabaseClient';
 import Leaderboard from './components/Leaderboard';
-
+import FloatingParticles from './components/FloatingParticles';
 
 const LEVEL_CONFIG = {
   1: {
@@ -142,6 +142,7 @@ function App() {
   if (gameState === 'welcome') {
     return (
       <>
+        <FloatingParticles />
         <WelcomeScreen onGameStart={handleGameStart} />
         {showInterstitial && (
           <LevelInterstitial

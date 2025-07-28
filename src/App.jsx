@@ -158,6 +158,8 @@ function App() {
 
   if (gameState === 'finished') {
     return (
+      <>
+        <FloatingParticles />
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="medieval-card w-full max-w-2xl mx-auto p-8 text-center animate-bounce-in">
           {/* Victory Crown */}
@@ -215,10 +217,10 @@ function App() {
         {/* Leaderboard */}
         <Leaderboard />
       </div>
+      </>
     );
   }
 
-  // Calculate the net penalty for display during the game
   const netPenalty = queryPenalty + (timeLeft * TIME_PENALTY_PER_SECOND);
 
   return (

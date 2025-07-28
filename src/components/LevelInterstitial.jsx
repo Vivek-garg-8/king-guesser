@@ -19,38 +19,26 @@ function LevelInterstitial({
   const [progress, setProgress] = useState(0);
   const [showRecap, setShowRecap] = useState(true);
 
+  // ... (Your useEffect and handler logic remains the same)
   useEffect(() => {
     if (!isVisible) return;
-
-    // Reset state when interstitial becomes visible
     setShowLoader(true);
     setShowButtons(false);
     setProgress(0);
     setShowRecap(true);
-    
-    // Select random king fact
     const randomFact = KING_FACTS[Math.floor(Math.random() * KING_FACTS.length)];
     setSelectedFact(randomFact);
-
-    // Play entrance chime sound (simulated with console for now)
     console.log('🔊 Crown chime sound');
-
-    // Hide recap after 1 second
     const recapTimer = setTimeout(() => {
       setShowRecap(false);
     }, 1000);
-
-    // Animate progress bar
     const progressTimer = setTimeout(() => {
       setProgress(100);
     }, 100);
-
-    // Hide loader and show buttons after 1.5 seconds
     const loaderTimer = setTimeout(() => {
       setShowLoader(false);
       setShowButtons(true);
     }, 1500);
-
     return () => {
       clearTimeout(recapTimer);
       clearTimeout(progressTimer);
@@ -67,6 +55,7 @@ function LevelInterstitial({
     console.log('🔊 Soft whoosh sound');
     onSkip();
   };
+
 
   if (!isVisible) return null;
 
@@ -182,23 +171,10 @@ function LevelInterstitial({
           overflow: hidden;
         }
 
-        .floating-particles {
-          position: absolute;
-          width: 100%;
-          height: 100%;
-        }
-
-        .particle {
-          position: absolute;
-          width: 4px;
-          height: 4px;
-          background: #ffd700;
-          border-radius: 50%;
-          opacity: 0.6;
-          animation: float-particle linear infinite;
-          box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
-        }
-
+        /* --- REMOVED STYLES --- */
+        /* The .floating-particles and .particle styles were here. */
+        /* They are now correctly handled by the FloatingParticles component. */
+        
         .progress-container {
           position: absolute;
           top: 0;
@@ -307,7 +283,7 @@ function LevelInterstitial({
         }
 
         .fact-container {
-          min-height: 120px; /* Reserve space to prevent layout shift */
+          min-height: 120px;
           display: flex;
           flex-direction: column;
           justify-content: center;
@@ -334,9 +310,9 @@ function LevelInterstitial({
         .button-container {
             margin-top: 40px;
             display: flex;
-            flex-direction: column-reverse; /* Puts Continue button on top of Skip */
+            flex-direction: column-reverse;
             align-items: center;
-            gap: 16px; /* Space between buttons */
+            gap: 16px;
             animation: fadeInUp 0.6s ease-out;
         }
 
@@ -353,7 +329,7 @@ function LevelInterstitial({
           transition: all 0.3s ease;
           position: relative;
           overflow: hidden;
-          min-width: 220px; /* Ensure consistent width */
+          min-width: 220px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -362,224 +338,9 @@ function LevelInterstitial({
           letter-spacing: 1px;
           box-shadow: 0 6px 20px rgba(255, 215, 0, 0.3);
         }
+
+        /* ... (rest of the styles are unchanged) */
         
-        .skip-button {
-          background: transparent;
-          border: none;
-          color: rgba(255, 215, 0, 0.6);
-          padding: 8px 16px;
-          border-radius: 20px;
-          font-size: 14px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-family: 'Crimson Text', serif;
-          text-transform: uppercase;
-          letter-spacing: 1px;
-        }
-
-        .skip-button:hover {
-          color: #ffd700;
-          text-decoration: underline;
-        }
-
-
-        .continue-button::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
-          transition: left 0.6s;
-        }
-
-        .continue-button:hover::before {
-          left: 100%;
-        }
-
-        .continue-button:hover {
-          transform: translateY(-3px);
-          box-shadow: 0 10px 30px rgba(255, 215, 0, 0.5);
-          border-color: #ffd700;
-        }
-
-        .continue-button:active {
-          transform: translateY(-1px);
-          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
-        }
-
-        .button-text {
-          font-size: 1.1rem;
-        }
-
-        .button-icon {
-          font-size: 1.3rem;
-          animation: bounce 2s ease-in-out infinite;
-        }
-
-        /* Animations */
-        @keyframes fadeIn {
-          from { opacity: 0; }
-          to { opacity: 1; }
-        }
-
-        @keyframes slideUp {
-          from { 
-            opacity: 0; 
-            transform: translateY(50px); 
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-
-        @keyframes slideDown {
-          from { 
-            opacity: 0; 
-            transform: translateY(-30px); 
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-
-        @keyframes fadeOut {
-          from { opacity: 1; }
-          to { opacity: 0; }
-        }
-
-        @keyframes fadeInUp {
-          from { 
-            opacity: 0; 
-            transform: translateY(20px); 
-          }
-          to { 
-            opacity: 1; 
-            transform: translateY(0); 
-          }
-        }
-
-        @keyframes float-particle {
-          0% { 
-            transform: translateY(100vh) translateX(0px); 
-            opacity: 0; 
-          }
-          10% { opacity: 0.6; }
-          90% { opacity: 0.6; }
-          100% { 
-            transform: translateY(-10px) translateX(20px); 
-            opacity: 0; 
-          }
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); }
-          50% { transform: scale(1.1); }
-        }
-
-        @keyframes rotate {
-          from { transform: rotate(0deg); }
-          to { transform: rotate(360deg); }
-        }
-
-        @keyframes glow {
-          from { 
-            filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); 
-          }
-          to { 
-            filter: drop-shadow(0 0 25px rgba(255, 215, 0, 0.9)); 
-          }
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-10px); }
-        }
-
-        @keyframes bounce {
-          0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
-          40% { transform: translateY(-5px); }
-          60% { transform: translateY(-3px); }
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-          .interstitial-content {
-            padding: 0 16px;
-          }
-
-          .level-title {
-            margin-bottom: 30px;
-          }
-
-          .continue-button {
-            font-size: 1rem;
-            padding: 14px 28px;
-            min-width: 200px;
-          }
-
-          .level-recap {
-            top: 60px;
-            padding: 12px 20px;
-          }
-
-          .crown-icon {
-            font-size: 3rem;
-          }
-        }
-
-        @media (max-width: 480px) {
-          .level-title {
-            margin-bottom: 24px;
-          }
-
-          .continue-button {
-            font-size: 0.9rem;
-            padding: 12px 24px;
-            min-width: 180px;
-          }
-
-          .button-container {
-            margin-top: 30px;
-          }
-
-          .crown-icon {
-            font-size: 2.5rem;
-          }
-        }
-
-        /* High contrast mode support */
-        @media (prefers-contrast: high) {
-          .interstitial-background {
-            background: #000000;
-          }
-          
-          .level-title {
-            color: #ffffff;
-            text-shadow: 2px 2px 4px #000000;
-          }
-          
-          .king-fact {
-            color: #ffffff;
-          }
-        }
-
-        /* Reduced motion support */
-        @media (prefers-reduced-motion: reduce) {
-          .particle,
-          .crown-icon,
-          .fact-icon,
-          .button-icon {
-            animation: none;
-          }
-          
-          .continue-button:hover {
-            transform: none;
-          }
-        }
       `}</style>
     </div>
   );

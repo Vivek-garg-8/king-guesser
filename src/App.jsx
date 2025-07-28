@@ -233,8 +233,7 @@ const LEVEL_CONFIG = {
 };
 const BOARD_ROWS = 10;
 const BOARD_COLS = 10;
-const BASE_SCORE = 20000;
-const TIME_PENALTY_PER_SECOND = 10;
+const TIME_PENALTY_PER_SECOND = 1;
 
 function App() {
   const [gameState, setGameState] = useState('welcome');

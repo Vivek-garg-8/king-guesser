@@ -71,6 +71,7 @@ function App() {
 
   const handleInterstitialContinue = () => {
     setShowInterstitial(false);
+    setIsPaused(false); // Resume the game
     // Small delay to allow fade out animation
     setTimeout(() => {
       setupLevel(2);
@@ -79,6 +80,7 @@ function App() {
 
   const handleInterstitialSkip = () => {
     setShowInterstitial(false);
+    setIsPaused(false); // Resume the game
     setupLevel(2);
   };
 

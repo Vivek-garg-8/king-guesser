@@ -1,6 +1,10 @@
 import React from 'react';
 
-function FloatingParticles() {
+// The component now accepts a "loop" prop, which defaults to true
+function FloatingParticles({ loop = true }) {
+  // The animation name is determined by the loop prop
+  const animationName = loop ? 'float-up-infinite' : 'float-up-once';
+
   return (
     <>
       <div className="floating-particles">
@@ -9,11 +13,11 @@ function FloatingParticles() {
             key={i}
             className="particle"
             style={{
-              // Each particle now starts at a random horizontal AND vertical position
               left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`, 
-              animationDelay: `${Math.random() * 5}s`, // Stagger the start
-              animationDuration: `${5 + Math.random() * 5}s`, // Vary the speed
+              top: `${Math.random() * 100}%`,
+              animationName: animationName, // Apply the correct animation
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${5 + Math.random() * 5}s`,
             }}
           />
         ))}
@@ -26,9 +30,9 @@ function FloatingParticles() {
           left: 0;
           width: 100%;
           height: 100%;
-          pointer-events: none; /* Ensure particles don't block clicks */
-          z-index: -1; /* Place behind other content */
-          overflow: hidden; /* Hide particles that float off-screen */
+          pointer-events: none;
+          z-index: -1;
+          overflow: hidden;
         }
 
         .particle {
@@ -37,25 +41,24 @@ function FloatingParticles() {
           height: 4px;
           background: #ffd700;
           border-radius: 50%;
-          opacity: 0; /* Start invisible */
-          animation: float-up linear infinite;
+          opacity: 0;
           box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
+          /* The animation is now defined in keyframes and applied via a style prop */
+          animation-timing-function: linear;
+          animation-fill-mode: forwards; /* Ensures the particle stays gone after one play */
         }
 
-        /* The animation now creates a gentle upward float from any position */
+        /* Renamed to a base animation */
         @keyframes float-up {
           0% {
             transform: translateY(0);
             opacity: 0;
           }
-          10% {
-            opacity: 0.7;
-          }
-          90% {
+          10%, 90% {
             opacity: 0.7;
           }
           100% {
-            transform: translateY(-150px); /* Floats 150px upwards */
+            transform: translateY(-150px);
             opacity: 0;
           }
         }
@@ -63,5 +66,25 @@ function FloatingParticles() {
     </>
   );
 }
+
+// We will define the animations directly in the component's style tag for clarity
+const GlobalStyles = () => (
+  <style jsx global>{`
+    @keyframes float-up-infinite {
+      0% { transform: translateY(0); opacity: 0; }
+      10%, 90% { opacity: 0.7; }
+      100% { transform: translateY(-150px); opacity: 0; }
+    }
+    @keyframes float-up-once {
+      0% { transform: translateY(0); opacity: 0; }
+      10%, 90% { opacity: 0.7; }
+      100% { transform: translateY(-150px); opacity: 0; }
+    }
+    .particle {
+      animation-name: float-up-infinite;
+    }
+  `}</style>
+);
+
 
 export default FloatingParticles;

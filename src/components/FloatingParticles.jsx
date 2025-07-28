@@ -1,5 +1,6 @@
 import React from 'react';
 
+// The component now accepts a "loop" prop, which defaults to true.
 function FloatingParticles({ loop = true }) {
   return (
     <>
@@ -11,6 +12,8 @@ function FloatingParticles({ loop = true }) {
             style={{
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
+              // Conditionally set the animation iteration count based on the loop prop.
+              // 'infinite' will make it loop, '1' will make it play only once.
               animationIterationCount: loop ? 'infinite' : '1',
               animationDelay: `${Math.random() * 5}s`,
               animationDuration: `${5 + Math.random() * 5}s`,
@@ -40,7 +43,7 @@ function FloatingParticles({ loop = true }) {
           opacity: 0; /* Start invisible */
           box-shadow: 0 0 6px rgba(255, 215, 0, 0.8);
           
-          /* The animation is now defined once and controlled by the iteration-count style prop */
+          /* The animation is defined once and controlled by the iteration-count style prop */
           animation-name: float-up;
           animation-timing-function: linear;
           /* This makes the particle stay gone after its animation finishes (for the one-shot case) */
@@ -65,4 +68,6 @@ function FloatingParticles({ loop = true }) {
   );
 }
 
-export default FloatingParticles;
+// By wrapping the component in React.memo, we prevent it from re-rendering
+// unless its props (like `loop`) actually change.
+export default React.memo(FloatingParticles);

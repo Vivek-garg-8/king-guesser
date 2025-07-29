@@ -94,21 +94,37 @@ function App() {
       const saveAndFetchRank = async () => {
         setIsRankLoading(true);
 
-        // 1. Save the player's score
-        const { error: insertError } = await supabase
+        // Check for an existing score for this player
+        const { data: existingPlayer, error: selectError } = await supabase
           .from('scores')
-          .insert([{ player_name: playerName, score: finalScore }]);
-        
-        if (insertError) {
-          console.error('Error saving score:', insertError);
-          setIsRankLoading(false);
-          return;
+          .select('score')
+          .eq('player_name', playerName)
+          .single();
+
+        // Handle the logic for inserting or updating the score
+        if (selectError && selectError.code !== 'PGRST116') { // PGRST116 means no row was found
+          console.error('Error checking for score:', selectError);
+        } else if (existingPlayer) {
+          // Player exists, so we only update if the new score is better (lower)
+          if (finalScore < existingPlayer.score) {
+            const { error: updateError } = await supabase
+              .from('scores')
+              .update({ score: finalScore })
+              .eq('player_name', playerName);
+            if (updateError) console.error('Error updating score:', updateError);
+          }
+        } else {
+          // Player does not exist, so insert a new score record
+          const { error: insertError } = await supabase
+            .from('scores')
+            .insert([{ player_name: playerName, score: finalScore }]);
+          if (insertError) console.error('Error inserting score:', insertError);
         }
 
-        // 2. Count how many players have a better (lower) score
+        // After saving/updating, fetch the player's new rank
         const { count, error: countError } = await supabase
           .from('scores')
-          .select('*', { count: 'exact', head: true }) // Efficiently count rows
+          .select('*', { count: 'exact', head: true })
           .lt('score', finalScore);
 
         if (countError) {
